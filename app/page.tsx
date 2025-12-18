@@ -165,8 +165,8 @@ export default function KanbutsuApp() {
 
       <header className="bg-white border-b border-stone-200 py-12 px-6 text-center">
         <p className="text-xs tracking-[0.4em] text-stone-400 mb-2 uppercase font-sans">Kamakura Ishiwata-Shoten</p>
-        <h1 className="text-4xl font-bold tracking-widest text-stone-800">石渡商店 乾物帖</h1>
-        <p className="mt-4 text-stone-500 italic text-sm">〜 鎌倉の風土が育む、乾物の美味しい知恵 〜</p>
+        <h1 className="text-4xl font-bold tracking-widest text-stone-800">石渡源三郎商店 乾物レシピ</h1>
+        <p className="mt-4 text-stone-500 italic text-sm">〜 日本の風土が育む、乾物の美味しい知恵 〜</p>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-12">
