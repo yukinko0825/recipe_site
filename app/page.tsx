@@ -164,8 +164,8 @@ export default function KanbutsuApp() {
       </div>
 
       <header className="bg-white border-b border-stone-200 py-12 px-6 text-center">
-        <p className="text-xs tracking-[0.4em] text-stone-400 mb-2 uppercase font-sans">Kamakura Ishiwata-Shoten</p>
-        <h1 className="text-4xl font-bold tracking-widest text-stone-800">石渡源三郎商店 乾物レシピ</h1>
+        <p className="text-xs tracking-[0.4em] text-stone-400 mb-2 uppercase font-sans">石渡源三郎商店</p>
+        <h1 className="text-4xl font-bold tracking-widest text-stone-800">乾物レシピ</h1>
         <p className="mt-4 text-stone-500 italic text-sm">〜 日本の風土が育む、乾物の美味しい知恵 〜</p>
       </header>
 
@@ -210,11 +210,11 @@ export default function KanbutsuApp() {
         <section className="mt-20 p-8 bg-stone-800 text-stone-100 rounded-lg shadow-inner relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2 italic">
-              <Info size={20} /> 乾物屋の豆知識
+              <Info size={20} /> 乾物の豆知識
             </h2>
             <p className="text-stone-400 text-sm leading-loose max-w-2xl font-sans">
               乾物は「時間を戻す」料理です。急がず、豆がゆっくりと水を吸う音を聞くように。
-              石渡商店では、鎌倉の地で代々伝わる「一番美味しく戻る瞬間」を大切にしています。
+              当店では、「一番美味しく戻る瞬間」を大切にしています。
             </p>
           </div>
           <div className="absolute right-[-20px] bottom-[-20px] opacity-10">
@@ -277,7 +277,7 @@ export default function KanbutsuApp() {
                 <div className="flex-1 space-y-5">
                   <input placeholder="料理名" className="w-full p-3 border-b outline-none focus:border-stone-800 text-lg" value={newName} onChange={e => setNewName(e.target.value)} required />
                   <div className="grid grid-cols-2 gap-4">
-                     <select className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newCategory} onChange={e => setNewCategory(e.target.value)}><option>豆</option><option>海藻</option><option>野菜</option><option>魚介</option></select>
+                     <select className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newCategory} onChange={e => setNewCategory(e.target.value)}><option>豆類</option><option>海藻</option><option>農産物</option><option>おせち食材</option></select>
                      <input placeholder="タグ（カンマ区切り）" className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newKeywords} onChange={e => setNewKeywords(e.target.value)} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
