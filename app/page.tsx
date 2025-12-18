@@ -107,35 +107,89 @@ export default function KanbutsuApp() {
     return data.publicUrl;
   };
 
-  const saveRecipe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!supabase) return;
+  // --- saveRecipe 関数を以下に丸ごと差し替え ---
+const saveRecipe = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!supabase) {
+    alert("Supabaseが正しく初期化されていません。");
+    return;
+  }
 
+  try {
+    // 1. メイン画像のアップロード
     let finalMainImageUrl = newImageUrl;
-    if (newImageFile) { const uploaded = await uploadImage(newImageFile); if (uploaded) finalMainImageUrl = uploaded; }
-    
-    const recipeData = { name: newName, category: newCategory, keywords: newKeywords.split(",").map(k => k.trim()), soak_time: newSoak, cook_time: newCook, description: newDesc, image: finalMainImageUrl || null };
-    
-    let recipeId = editingId;
-    if (editingId) { 
-      await supabase.from('recipes').update(recipeData).eq('id', editingId); 
-      await supabase.from('recipe_steps').delete().eq('recipe_id', editingId); 
-    } else { 
-      const { data } = await supabase.from('recipes').insert([recipeData]).select(); 
-      recipeId = data?.[0].id; 
+    if (newImageFile) {
+      const uploaded = await uploadImage(newImageFile);
+      if (uploaded) {
+        finalMainImageUrl = uploaded;
+      } else {
+        throw new Error("メイン画像のアップロードに失敗しました。");
+      }
     }
 
-    if (recipeId) {
-      const stepDataPromises = steps.filter(s => s.description).map(async (s, index) => {
-        let finalStepUrl = s.image_url;
-        if (s.image_file) { const uploaded = await uploadImage(s.image_file); if (uploaded) finalStepUrl = uploaded; }
-        return { recipe_id: recipeId, step_number: index + 1, description: s.description, image_url: finalStepUrl || null };
-      });
-      const stepData = await Promise.all(stepDataPromises);
-      if (stepData.length > 0) await supabase.from('recipe_steps').insert(stepData);
+    // 2. レシピ本体のデータ準備
+    const recipeData = {
+      name: newName,
+      category: newCategory,
+      keywords: newKeywords.split(",").map(k => k.trim()).filter(k => k !== ""),
+      soak_time: newSoak,
+      cook_time: newCook,
+      description: newDesc,
+      image: finalMainImageUrl || null
+    };
+
+    let recipeId = editingId;
+
+    if (editingId) {
+      // 更新モード
+      const { error: updateError } = await supabase.from('recipes').update(recipeData).eq('id', editingId);
+      if (updateError) throw updateError;
+      
+      // 手順は一度消してから再登録する（一番確実な方法）
+      const { error: deleteError } = await supabase.from('recipe_steps').delete().eq('recipe_id', editingId);
+      if (deleteError) throw deleteError;
+    } else {
+      // 新規作成モード
+      const { data, error: insertError } = await supabase.from('recipes').insert([recipeData]).select().single();
+      if (insertError) throw insertError;
+      recipeId = data.id;
     }
-    setShowForm(false); resetForm(); fetchRecipes();
-  };
+
+    // 3. 手順（Steps）の保存
+    if (recipeId) {
+      const stepDataPromises = steps
+        .filter(s => s.description.trim() !== "") // 空の説明文は除外
+        .map(async (s, index) => {
+          let finalStepUrl = s.image_url;
+          if (s.image_file) {
+            const uploaded = await uploadImage(s.image_file);
+            if (uploaded) finalStepUrl = uploaded;
+          }
+          return {
+            recipe_id: recipeId,
+            step_number: index + 1,
+            description: s.description,
+            image_url: finalStepUrl || null
+          };
+        });
+
+      const stepData = await Promise.all(stepDataPromises);
+      if (stepData.length > 0) {
+        const { error: stepError } = await supabase.from('recipe_steps').insert(stepData);
+        if (stepError) throw stepError;
+      }
+    }
+
+    alert(editingId ? "更新しました！" : "新しく保存しました！");
+    setShowForm(false);
+    resetForm();
+    fetchRecipes();
+
+  } catch (error: any) {
+    console.error("Save Error:", error);
+    alert("保存に失敗しました: " + (error.message || "不明なエラー"));
+  }
+};
 
   const resetForm = () => {
     setEditingId(null); setNewName(""); setNewSoak(""); setNewCook(""); setNewDesc(""); setNewKeywords(""); setNewImageUrl(""); setNewImageFile(null);
