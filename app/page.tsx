@@ -12,6 +12,7 @@ const ImageUpload = ({ currentImage, onFileSelect, label, isSmall = false }: { c
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImage);
   useEffect(() => { setPreviewUrl(currentImage); }, [currentImage]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -19,6 +20,7 @@ const ImageUpload = ({ currentImage, onFileSelect, label, isSmall = false }: { c
     setPreviewUrl(objectUrl);
     onFileSelect(file);
   };
+
   const containerClass = isSmall ? "w-24 h-24" : "w-full aspect-video md:aspect-square";
   return (
     <div className="space-y-1">
@@ -27,7 +29,7 @@ const ImageUpload = ({ currentImage, onFileSelect, label, isSmall = false }: { c
         {previewUrl ? (
           <><img src={previewUrl} className="w-full h-full object-cover" alt="" /><div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"><UploadCloud size={20} /></div></>
         ) : (
-          <div className="text-stone-300 text-[10px] tracking-widest uppercase font-sans">Select Photo</div>
+          <div className="text-stone-300 text-[10px] tracking-widest uppercase font-sans text-center px-2">Select Photo</div>
         )}
         <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
       </div>
@@ -70,6 +72,23 @@ export default function KanbutsuApp() {
     setSelectedSteps(data || []);
   };
 
+  // --- 手順操作用ハンドラ (ここが不足していました) ---
+  const handleStepTextChange = (index: number, value: string) => {
+    const newSteps = [...steps];
+    newSteps[index].description = value;
+    setSteps(newSteps);
+  };
+
+  const handleStepFileChange = (index: number, file: File) => {
+    const newSteps = [...steps];
+    newSteps[index].image_file = file;
+    newSteps[index].image_url = URL.createObjectURL(file);
+    setSteps(newSteps);
+  };
+
+  const addStepRow = () => setSteps([...steps, { description: "", image_url: "", image_file: null }]);
+  const removeStepRow = (index: number) => setSteps(steps.filter((_, i) => i !== index));
+
   const startEdit = async (e: React.MouseEvent, recipe: any) => {
     e.stopPropagation();
     setEditingId(recipe.id); setNewName(recipe.name); setNewCategory(recipe.category);
@@ -90,19 +109,30 @@ export default function KanbutsuApp() {
 
   const saveRecipe = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) return;
+
     let finalMainImageUrl = newImageUrl;
     if (newImageFile) { const uploaded = await uploadImage(newImageFile); if (uploaded) finalMainImageUrl = uploaded; }
+    
     const recipeData = { name: newName, category: newCategory, keywords: newKeywords.split(",").map(k => k.trim()), soak_time: newSoak, cook_time: newCook, description: newDesc, image: finalMainImageUrl || null };
+    
     let recipeId = editingId;
-    if (editingId) { await supabase!.from('recipes').update(recipeData).eq('id', editingId); await supabase!.from('recipe_steps').delete().eq('recipe_id', editingId); }
-    else { const { data } = await supabase!.from('recipes').insert([recipeData]).select(); recipeId = data?.[0].id; }
+    if (editingId) { 
+      await supabase.from('recipes').update(recipeData).eq('id', editingId); 
+      await supabase.from('recipe_steps').delete().eq('recipe_id', editingId); 
+    } else { 
+      const { data } = await supabase.from('recipes').insert([recipeData]).select(); 
+      recipeId = data?.[0].id; 
+    }
+
     if (recipeId) {
-      const stepData = await Promise.all(steps.filter(s => s.description).map(async (s, index) => {
+      const stepDataPromises = steps.filter(s => s.description).map(async (s, index) => {
         let finalStepUrl = s.image_url;
         if (s.image_file) { const uploaded = await uploadImage(s.image_file); if (uploaded) finalStepUrl = uploaded; }
         return { recipe_id: recipeId, step_number: index + 1, description: s.description, image_url: finalStepUrl || null };
-      }));
-      if (stepData.length > 0) await supabase!.from('recipe_steps').insert(stepData);
+      });
+      const stepData = await Promise.all(stepDataPromises);
+      if (stepData.length > 0) await supabase.from('recipe_steps').insert(stepData);
     }
     setShowForm(false); resetForm(); fetchRecipes();
   };
@@ -118,7 +148,7 @@ export default function KanbutsuApp() {
   return (
     <div className="min-h-screen bg-[#fcfaf2] text-[#333] font-serif pb-20 selection:bg-stone-200">
       
-      {/* --- 管理バー --- */}
+      {/* 管理バー */}
       <div className="bg-stone-100 p-2 flex justify-end gap-2 px-6 border-b border-stone-200">
         {!isAdmin ? (
           <div className="flex items-center gap-2">
@@ -140,12 +170,13 @@ export default function KanbutsuApp() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-12">
+        {/* 検索 */}
         <div className="relative mb-16 max-w-lg mx-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" size={20} />
           <input type="text" placeholder="単語を入力（例：豆、お弁当、時短...）" className="w-full pl-12 pr-4 py-4 rounded-full border border-stone-200 shadow-sm focus:ring-2 focus:ring-stone-100 outline-none font-sans bg-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
 
-        {/* --- カード一覧（最初のデザインを維持） --- */}
+        {/* カード一覧 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {recipes.filter(r => r.name.includes(searchTerm)).map((recipe) => (
             <article key={recipe.id} onClick={() => openDetail(recipe)} className="group bg-white rounded-lg overflow-hidden border border-stone-100 shadow-sm hover:shadow-md transition-all cursor-pointer relative">
@@ -163,10 +194,8 @@ export default function KanbutsuApp() {
                 )}
               </div>
               <div className="p-8">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-stone-800 text-white text-[10px] px-2 py-0.5 rounded tracking-widest uppercase font-sans">{recipe.category}</span>
-                </div>
-                <h3 className="text-2xl font-bold mb-4 group-hover:text-stone-600 transition-colors">{recipe.name}</h3>
+                <span className="bg-stone-800 text-white text-[10px] px-2 py-0.5 rounded tracking-widest uppercase font-sans">{recipe.category}</span>
+                <h3 className="text-2xl font-bold mt-3 mb-4 group-hover:text-stone-600 transition-colors">{recipe.name}</h3>
                 <p className="text-stone-500 text-sm leading-relaxed mb-6 italic line-clamp-2 font-sans">「{recipe.description}」</p>
                 <div className="flex justify-between items-center text-stone-400 border-t border-stone-50 pt-4 font-sans text-xs">
                    <div className="flex gap-4 italic"><span className="flex items-center gap-1"><Clock size={12}/> {recipe.soak_time || "—"}</span><span className="flex items-center gap-1"><Utensils size={12}/> {recipe.cook_time || "—"}</span></div>
@@ -177,7 +206,7 @@ export default function KanbutsuApp() {
           ))}
         </div>
 
-        {/* --- 乾物屋の豆知識セクション（足したい部分） --- */}
+        {/* 豆知識セクション */}
         <section className="mt-20 p-8 bg-stone-800 text-stone-100 rounded-lg shadow-inner relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2 italic">
@@ -194,7 +223,7 @@ export default function KanbutsuApp() {
         </section>
       </main>
 
-      {/* --- 詳細表示モーダル（50/50レイアウト） --- */}
+      {/* 詳細モーダル */}
       {selectedRecipe && (
         <div className="fixed inset-0 bg-stone-900/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 md:p-8" onClick={() => setSelectedRecipe(null)}>
           <div className="bg-[#fcfaf2] w-full max-w-4xl max-h-full overflow-y-auto rounded-2xl shadow-2xl relative" onClick={e => e.stopPropagation()}>
@@ -206,7 +235,7 @@ export default function KanbutsuApp() {
               <div className="w-full md:w-1/2 p-10 flex flex-col">
                 <div className="mb-6">
                   <span className="text-xs tracking-widest text-stone-400 border-b border-stone-200 pb-1 uppercase font-sans">{selectedRecipe.category}</span>
-                  <h2 className="text-3xl font-bold mt-4 text-stone-800">{selectedRecipe.name}</h2>
+                  <h2 className="text-3xl font-bold mt-4 text-stone-800 leading-tight">{selectedRecipe.name}</h2>
                 </div>
                 <p className="text-stone-600 leading-loose italic mb-10 font-sans">「{selectedRecipe.description}」</p>
                 <div className="space-y-8 flex-grow">
@@ -237,41 +266,46 @@ export default function KanbutsuApp() {
         </div>
       )}
 
-      {/* --- 編集・作成フォーム --- */}
+      {/* 編集フォーム */}
       {showForm && (
-        <div className="fixed inset-0 bg-stone-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 font-sans text-sm">
-          <div className="bg-white rounded-2xl w-full max-w-2xl p-8 relative max-h-[90vh] overflow-y-auto shadow-2xl">
-            <button onClick={() => setShowForm(false)} className="absolute top-5 right-5 text-stone-300"><X /></button>
+        <div className="fixed inset-0 bg-stone-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-3xl p-8 relative max-h-[90vh] overflow-y-auto shadow-2xl">
+            <button onClick={() => setShowForm(false)} className="absolute top-5 right-5 text-stone-300 hover:text-stone-600"><X /></button>
             <h2 className="text-2xl font-bold mb-8 italic text-stone-800 font-serif">{editingId ? "レシピを編集" : "新レシピの登録"}</h2>
-            <form onSubmit={saveRecipe} className="space-y-6">
-              <div className="flex flex-col md:flex-row gap-6 border-b pb-6">
-                <div className="flex-1 space-y-4">
-                  <input placeholder="料理名" className="w-full p-2 border-b outline-none focus:border-stone-800 text-lg" value={newName} onChange={e => setNewName(e.target.value)} required />
+            <form onSubmit={saveRecipe} className="space-y-8 font-sans text-sm">
+              <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex-1 space-y-5">
+                  <input placeholder="料理名" className="w-full p-3 border-b outline-none focus:border-stone-800 text-lg" value={newName} onChange={e => setNewName(e.target.value)} required />
                   <div className="grid grid-cols-2 gap-4">
-                    <select className="p-2 bg-stone-50 border rounded" value={newCategory} onChange={e => setNewCategory(e.target.value)}><option>豆</option><option>海藻</option><option>野菜</option><option>魚介</option></select>
-                    <input placeholder="タグ" className="p-2 bg-stone-50 border rounded" value={newKeywords} onChange={e => setNewKeywords(e.target.value)} />
+                     <select className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newCategory} onChange={e => setNewCategory(e.target.value)}><option>豆</option><option>海藻</option><option>野菜</option><option>魚介</option></select>
+                     <input placeholder="タグ（カンマ区切り）" className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newKeywords} onChange={e => setNewKeywords(e.target.value)} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <input placeholder="戻し時間" className="p-2 bg-stone-50 border rounded" value={newSoak} onChange={e => setNewSoak(e.target.value)} />
-                    <input placeholder="調理時間" className="p-2 bg-stone-50 border rounded" value={newCook} onChange={e => setNewCook(e.target.value)} />
+                    <input placeholder="戻し時間" className="p-3 bg-stone-50 border rounded-lg outline-none" value={newSoak} onChange={e => setNewSoak(e.target.value)} />
+                    <input placeholder="調理時間" className="p-3 bg-stone-50 border rounded-lg outline-none" value={newCook} onChange={e => setNewCook(e.target.value)} />
                   </div>
+                  <textarea placeholder="一言説明（魅力やコツ）" className="w-full p-3 bg-stone-50 border rounded-lg h-24 outline-none resize-none" value={newDesc} onChange={e => setNewDesc(e.target.value)} />
                 </div>
-                <div className="w-48 flex-shrink-0"><ImageUpload label="メイン写真" currentImage={newImageUrl} onFileSelect={setNewImageFile} /></div>
+                <div className="w-full md:w-64 flex-shrink-0">
+                  <ImageUpload label="メイン画像" currentImage={newImageUrl} onFileSelect={setNewImageFile} />
+                </div>
               </div>
-              <textarea placeholder="一言説明" className="w-full p-3 bg-stone-50 border rounded h-20 outline-none" value={newDesc} onChange={e => setNewDesc(e.target.value)} />
-              <div className="space-y-4">
-                <h4 className="font-bold text-stone-600 flex items-center gap-2">手順の追加</h4>
-                {steps.map((step, idx) => (
-                  <div key={idx} className="p-4 bg-stone-50 rounded flex gap-4 items-start relative border border-stone-100 group">
-                    <button type="button" onClick={() => setSteps(steps.filter((_, i) => i !== idx))} className="absolute top-1 right-1 text-stone-300 opacity-0 group-hover:opacity-100"><X size={14}/></button>
-                    <span className="text-stone-300 font-bold italic">#{idx+1}</span>
-                    <textarea placeholder="作り方" className="flex-1 p-2 bg-white border rounded h-20 outline-none" value={step.description} onChange={e => {const n=[...steps]; n[idx].description=e.target.value; setSteps(n);}} />
-                    <ImageUpload label="写真" isSmall currentImage={step.image_url} onFileSelect={(f) => {const n=[...steps]; n[idx].image_file=f; n[idx].image_url=URL.createObjectURL(f); setSteps(n);}} />
-                  </div>
-                ))}
-                <button type="button" onClick={() => setSteps([...steps, {description:"", image_url:"", image_file:null}])} className="w-full py-2 border border-dashed border-stone-300 rounded text-stone-400 text-xs">+ 手順を追加</button>
+
+              <div className="border-t pt-8">
+                <h4 className="font-bold mb-6 flex items-center gap-2 italic text-stone-600"><Utensils size={16}/> 作り方の手順</h4>
+                <div className="space-y-4">
+                  {steps.map((step, idx) => (
+                    <div key={idx} className="p-4 bg-stone-50 rounded-xl relative group border border-stone-100 flex gap-4 items-start">
+                      <button type="button" onClick={() => removeStepRow(idx)} className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"><X size={12}/></button>
+                      <span className="font-bold text-stone-300 italic pt-2">#{idx+1}</span>
+                      <textarea placeholder="手順の説明文" className="flex-1 p-2 bg-white border rounded-lg outline-none text-sm h-24 resize-none" value={step.description} onChange={e => handleStepTextChange(idx, e.target.value)} />
+                      <ImageUpload label="写真" isSmall currentImage={step.image_url} onFileSelect={(file) => handleStepFileChange(idx, file)} />
+                    </div>
+                  ))}
+                  <button type="button" onClick={addStepRow} className="w-full py-3 border-2 border-dashed border-stone-200 rounded-xl text-stone-400 hover:border-stone-400 hover:text-stone-600 flex items-center justify-center gap-2 transition-all hover:bg-stone-50 font-sans"><Plus size={16}/> 手順を追加</button>
+                </div>
               </div>
-              <button type="submit" className="w-full bg-stone-800 text-white py-4 rounded font-bold tracking-[0.3em] hover:bg-stone-700 transition-all shadow-lg active:scale-[0.98]">データベースに保存する</button>
+              <button type="submit" className="w-full bg-stone-800 text-white py-4 rounded-xl font-bold tracking-[0.3em] hover:bg-stone-700 transition-all shadow-lg active:scale-[0.99]">データベースに保存</button>
             </form>
           </div>
         </div>
