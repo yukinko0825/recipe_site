@@ -157,7 +157,6 @@ export default function KanbutsuApp() {
       className="h-8 md:h-10 w-auto object-contain mix-blend-multiply" 
     />
     <span className="text-[10px] tracking-[0.2em] text-stone-500 font-sans hidden sm:inline">
-      明治初年創業
     </span>
   </div>
 
@@ -172,7 +171,7 @@ export default function KanbutsuApp() {
         onChange={(e) => setPassword(e.target.value)} 
       />
       <button 
-        onClick={() => {if(password==="1234"){setIsAdmin(true);setPassword("")}}} 
+        onClick={() => {if(password==="0825"){setIsAdmin(true);setPassword("")}}} 
         className="text-stone-400 hover:text-stone-600 transition-colors"
       >
         <Lock size={12} />
@@ -352,9 +351,56 @@ export default function KanbutsuApp() {
         </div>
       )}
 
-      <footer className="py-16 text-center text-stone-400 text-[10px] tracking-[0.3em] uppercase font-sans">
-        © 石渡源三郎商店 無断転載を禁じます。
-      </footer>
+      <footer className="bg-stone-100 border-t border-stone-200 pt-12 pb-8 px-6">
+  <div className="max-w-4xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10 text-stone-700">
+      
+      {/* 左側：店舗基本情報 */}
+      <div className="space-y-3">
+        <h3 className="font-bold text-lg text-stone-900">石渡源三郎商店</h3>
+        <p className="text-sm leading-relaxed">
+          〒248-0016<br />
+          神奈川県鎌倉市長谷2-14-23
+        </p>
+        <div className="text-sm">
+          <p>営業時間：9:00 〜 18:00</p>
+          <p>定休日：日曜日</p>
+        </div>
+        <div className="pt-2">
+          <a 
+            href="http://www.yamagen-mame.co.jp" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-xs text-stone-500 underline hover:text-stone-800 transition-colors"
+          >
+            公式ホームページはこちら
+          </a>
+        </div>
+      </div>
+
+      {/* 右側：お問い合わせ情報 */}
+      <div className="space-y-3 md:border-l md:pl-10 border-stone-200">
+        <h3 className="font-bold text-stone-900">お問い合わせ</h3>
+        <div className="bg-white/50 p-4 rounded-lg border border-stone-200">
+          <p className="text-lg font-bold text-stone-800">0467-22-0193</p>
+          <p className="text-xs text-stone-500 mt-1">
+            受付時間：9:00 〜 18:00（日曜除く）
+          </p>
+        </div>
+        <p className="text-[10px] text-stone-400 leading-tight mt-4">
+          ※お電話でのご注文や、商品の在庫状況などお気軽にお問い合わせください。
+        </p>
+      </div>
+    </div>
+
+    {/* コピーライト */}
+    <div className="text-center pt-8 border-t border-stone-200">
+      <p className="text-xs text-stone-400 tracking-widest">
+        &copy; ©石渡源三郎商店 無断転載を禁じます。
+      </p>
+    </div>
+  </div>
+</footer>
     </div>
   );
 }
