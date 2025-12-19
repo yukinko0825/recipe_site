@@ -214,7 +214,7 @@ export default function KanbutsuApp() {
             </h2>
             <p className="text-stone-400 text-sm leading-loose max-w-2xl font-sans">
               乾物は「時間を戻す」料理です。急がず、豆がゆっくりと水を吸う音を聞くように。
-              石渡商店では、鎌倉の地で代々伝わる「一番美味しく戻る瞬間」を大切にしています。
+              当店では、鎌倉の地で代々伝わる「一番美味しく戻る瞬間」を大切にしています。
             </p>
           </div>
           <div className="absolute right-[-20px] bottom-[-20px] opacity-10">
@@ -277,7 +277,7 @@ export default function KanbutsuApp() {
                 <div className="flex-1 space-y-5">
                   <input placeholder="料理名" className="w-full p-3 border-b outline-none focus:border-stone-800 text-lg" value={newName} onChange={e => setNewName(e.target.value)} required />
                   <div className="grid grid-cols-2 gap-4">
-                     <select className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newCategory} onChange={e => setNewCategory(e.target.value)}><option>豆</option><option>海藻</option><option>野菜</option><option>魚介</option></select>
+                     <select className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newCategory} onChange={e => setNewCategory(e.target.value)}><option>豆</option><option>海藻</option><option>農産物</option><option>おせち食材</option></select>
                      <input placeholder="タグ（カンマ区切り）" className="w-full p-3 bg-stone-50 border rounded-lg outline-none" value={newKeywords} onChange={e => setNewKeywords(e.target.value)} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
