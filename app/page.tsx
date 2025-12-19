@@ -312,7 +312,7 @@ export default function KanbutsuApp() {
       )}
 
       <footer className="py-16 text-center text-stone-400 text-[10px] tracking-[0.3em] uppercase font-sans">
-        © Kamakura Ishiwata-Shoten All Rights Reserved.
+        © 石渡源三郎商店 All Rights Reserved.
       </footer>
     </div>
   );
