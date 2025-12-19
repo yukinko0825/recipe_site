@@ -379,8 +379,8 @@ export default function KanbutsuApp() {
     <div className="mb-12 space-y-4">
       <div className="inline-block bg-white/60 p-6 rounded-xl border border-stone-200 shadow-sm">
         <p className="text-xs text-stone-500 mb-1">お問い合わせ電話番号</p>
-        <p className="text-2xl font-bold text-stone-800 tracking-wider">0467-22-0193</p>
-        <p className="text-[11px] text-stone-400 mt-2">
+        <p className="text-3xl font-bold text-stone-800 tracking-wider font-mono">0467-22-0193</p>
+        <p className="text-[11px] text-stone-400 mt-2 font-sans">
           受付時間：9:00 〜 18:00（日曜除く）
         </p>
       </div>
