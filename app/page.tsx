@@ -357,10 +357,10 @@ export default function KanbutsuApp() {
     {/* 1. 店舗基本情報 */}
     <div className="mb-12 space-y-4">
       <h3 className="font-bold text-xl text-stone-900 tracking-widest">石渡源三郎商店</h3>
-      <p className="text-sm text-stone-700 leading-relaxed">
+      <p className="text-sm text-stone-700 leading-relaxed font-sans">
         〒248-0016 神奈川県鎌倉市長谷2-14-23
       </p>
-      <p className="text-sm text-stone-700">
+      <p className="text-sm text-stone-700 font-sans">
         営業時間：9:00 〜 18:00 <span className="mx-2 text-stone-300">|</span> 定休日：日曜日
       </p>
       <div className="pt-2">
@@ -379,7 +379,7 @@ export default function KanbutsuApp() {
     <div className="mb-12 space-y-4">
       <div className="inline-block bg-white/60 p-6 rounded-xl border border-stone-200 shadow-sm">
         <p className="text-xs text-stone-500 mb-1">お問い合わせ電話番号</p>
-        <p className="text-3xl font-bold text-stone-800 tracking-wider font-mono">0467-22-0193</p>
+        <p className="text-3xl font-bold text-stone-800 tracking-wider font-sans">0467-22-0193</p>
         <p className="text-[11px] text-stone-400 mt-2 font-sans">
           受付時間：9:00 〜 18:00（日曜除く）
         </p>
