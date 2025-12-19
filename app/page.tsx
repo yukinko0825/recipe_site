@@ -377,8 +377,6 @@ export default function KanbutsuApp() {
 
     {/* 2. お問い合わせ（電話番号） */}
     <div className="mb-12 space-y-4">
-      <h3 className="font-bold text-sm uppercase tracking-tighter text-stone-500">Contact</h3>
-      {/* inline-block を使うことで、枠を中央に配置しています */}
       <div className="inline-block bg-white/60 p-6 rounded-xl border border-stone-200 shadow-sm">
         <p className="text-xs text-stone-500 mb-1">お問い合わせ電話番号</p>
         <p className="text-2xl font-bold text-stone-800 tracking-wider">0467-22-0193</p>
