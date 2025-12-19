@@ -168,7 +168,7 @@ export default function KanbutsuApp() {
   style={{ backgroundImage: "url('\header-bg.jpg')" }} // ← ここに使用したい画像のパスを入れてください
 >
   {/* 背景画像の上に薄い白のフィルターを重ねて文字を読みやすくします */}
-  <div className="absolute inset-0 bg-white/65 backdrop-blur-[1px]"></div>
+  <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px]"></div>
 
   <div className="relative z-10">
     <p className="text-xs tracking-[0.4em] text-stone-600 mb-2 uppercase font-sans font-bold">石渡源三郎商店</p>
