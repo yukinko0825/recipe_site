@@ -165,7 +165,7 @@ export default function KanbutsuApp() {
 
       <header 
   className="relative border-b border-stone-200 py-24 px-6 text-center overflow-hidden bg-cover bg-center"
-  style={{ backgroundImage: "url('\public\header-bg.jpg')" }} // ← ここに使用したい画像のパスを入れてください
+  style={{ backgroundImage: "url('\header-bg.jpg')" }} // ← ここに使用したい画像のパスを入れてください
 >
   {/* 背景画像の上に薄い白のフィルターを重ねて文字を読みやすくします */}
   <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]"></div>
@@ -320,7 +320,7 @@ export default function KanbutsuApp() {
       )}
 
       <footer className="py-16 text-center text-stone-400 text-[10px] tracking-[0.3em] uppercase font-sans">
-        © 石渡源三郎商店 All Rights Reserved.
+        © 石渡源三郎商店 無断転載を禁じます。
       </footer>
     </div>
   );
