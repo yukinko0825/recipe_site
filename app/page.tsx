@@ -148,20 +148,53 @@ export default function KanbutsuApp() {
   return (
     <div className="min-h-screen bg-[#fcfaf2] text-[#333] font-serif pb-20 selection:bg-stone-200">
       
-      {/* 管理バー */}
-      <div className="bg-stone-100 p-2 flex justify-end gap-2 px-6 border-b border-stone-200">
-        {!isAdmin ? (
-          <div className="flex items-center gap-2">
-            <input type="password" placeholder="Pass" className="text-[10px] p-1 border rounded bg-white font-sans" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button onClick={() => {if(password==="1234"){setIsAdmin(true);setPassword("")}}} className="text-stone-400 hover:text-stone-600"><Lock size={12} /></button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-4">
-            <button onClick={() => {resetForm(); setShowForm(true);}} className="text-xs bg-stone-800 text-white px-3 py-1 rounded-full flex items-center gap-1 font-sans"><PlusCircle size={14}/> 新レシピ追加</button>
-            <button onClick={() => setIsAdmin(false)} className="text-stone-400 hover:text-stone-600"><Unlock size={12} /></button>
-          </div>
-        )}
-      </div>
+      <div className="bg-stone-100 p-2 flex justify-between items-center px-6 border-b border-stone-200">
+  {/* 左側：お店のロゴ */}
+  <div className="flex items-center gap-2">
+    <img 
+      src="/rogo.jpg" 
+      alt="石渡源三郎商店" 
+      className="h-8 md:h-10 w-auto object-contain mix-blend-multiply" 
+    />
+    <span className="text-[10px] tracking-[0.2em] text-stone-500 font-sans hidden sm:inline">
+      明治初年創業
+    </span>
+  </div>
+
+  {/* 右側：管理エリア（既存のパスワード入力など） */}
+  {!isAdmin ? (
+    <div className="flex items-center gap-2">
+      <input 
+        type="password" 
+        placeholder="Pass" 
+        className="text-[10px] p-1 border rounded bg-white font-sans outline-none focus:ring-1 focus:ring-stone-300" 
+        value={password} 
+        onChange={(e) => setPassword(e.target.value)} 
+      />
+      <button 
+        onClick={() => {if(password==="1234"){setIsAdmin(true);setPassword("")}}} 
+        className="text-stone-400 hover:text-stone-600 transition-colors"
+      >
+        <Lock size={12} />
+      </button>
+    </div>
+  ) : (
+    <div className="flex items-center gap-4">
+      <button 
+        onClick={() => {resetForm(); setShowForm(true);}} 
+        className="text-xs bg-stone-800 text-white px-3 py-1 rounded-full flex items-center gap-1 font-sans hover:bg-stone-700 transition-all shadow-sm"
+      >
+        <PlusCircle size={14}/> 新レシピ追加
+      </button>
+      <button 
+        onClick={() => setIsAdmin(false)} 
+        className="text-stone-400 hover:text-stone-600"
+      >
+        <Unlock size={12} />
+      </button>
+    </div>
+  )}
+</div>
 
       <header 
   className="relative border-b border-stone-200 py-24 px-6 text-center overflow-hidden bg-cover bg-center"
