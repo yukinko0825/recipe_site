@@ -72,7 +72,7 @@ export default function KanbutsuApp() {
     setSelectedSteps(data || []);
   };
 
-  // --- 手順操作用ハンドラ (ここが不足していました) ---
+  // --- 手順操作用ハンドラ ---
   const handleStepTextChange = (index: number, value: string) => {
     const newSteps = [...steps];
     newSteps[index].description = value;
@@ -171,9 +171,9 @@ export default function KanbutsuApp() {
   <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px]"></div>
 
   <div className="relative z-10">
-    <p className="text-xs tracking-[0.4em] text-stone-600 mb-2 uppercase font-sans font-bold">石渡源三郎商店</p>
-    <h1 className="text-5xl font-bold tracking-widest text-stone-900 drop-shadow-sm">乾物レシピ</h1>
-    <p className="mt-4 text-stone-800 italic text-sm font-medium">〜 日本の風土が育む、乾物の美味しい知恵 〜</p>
+    <p className="text-xs tracking-[0.4em] text-stone-700 mb-2 uppercase font-sans font-bold">石渡源三郎商店</p>
+    <h1 className="text-5xl font-bold tracking-widest text-stone-1000 drop-shadow-sm">乾物レシピ</h1>
+    <p className="mt-4 text-stone-900 italic text-sm font-medium">〜 日本の風土が育む、乾物の美味しい知恵 〜</p>
   </div>
 </header>
 
