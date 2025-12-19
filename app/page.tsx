@@ -165,7 +165,7 @@ export default function KanbutsuApp() {
 
       <header 
   className="relative border-b border-stone-200 py-24 px-6 text-center overflow-hidden bg-cover bg-center"
-  style={{ backgroundImage: "url('/header-bg.jpg')" }} // ← ここに使用したい画像のパスを入れてください
+  style={{ backgroundImage: "url('C:\\Users\\優希\\Pictures\\header-bg.jpg')" }} // ← ここに使用したい画像のパスを入れてください
 >
   {/* 背景画像の上に薄い白のフィルターを重ねて文字を読みやすくします */}
   <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]"></div>
