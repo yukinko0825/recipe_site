@@ -163,11 +163,19 @@ export default function KanbutsuApp() {
         )}
       </div>
 
-      <header className="bg-white border-b border-stone-200 py-12 px-6 text-center">
-        <p className="text-xs tracking-[0.4em] text-stone-400 mb-2 uppercase font-sans">石渡源三郎商店</p>
-        <h1 className="text-4xl font-bold tracking-widest text-stone-800">乾物レシピ</h1>
-        <p className="mt-4 text-stone-500 italic text-sm">〜 日本の風土が育む、乾物の美味しい知恵 〜</p>
-      </header>
+      <header 
+  className="relative border-b border-stone-200 py-24 px-6 text-center overflow-hidden bg-cover bg-center"
+  style={{ backgroundImage: "url('/header-bg.jpg')" }} // ← ここに使用したい画像のパスを入れてください
+>
+  {/* 背景画像の上に薄い白のフィルターを重ねて文字を読みやすくします */}
+  <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]"></div>
+
+  <div className="relative z-10">
+    <p className="text-xs tracking-[0.4em] text-stone-600 mb-2 uppercase font-sans font-bold">石渡源三郎商店</p>
+    <h1 className="text-5xl font-bold tracking-widest text-stone-900 drop-shadow-sm">乾物レシピ</h1>
+    <p className="mt-4 text-stone-800 italic text-sm font-medium">〜 日本の風土が育む、乾物の美味しい知恵 〜</p>
+  </div>
+</header>
 
       <main className="max-w-4xl mx-auto px-6 py-12">
         {/* 検索 */}
