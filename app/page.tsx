@@ -111,31 +111,73 @@ export default function KanbutsuApp() {
     e.preventDefault();
     if (!supabase) return;
 
+    try {
     let finalMainImageUrl = newImageUrl;
-    if (newImageFile) { const uploaded = await uploadImage(newImageFile); if (uploaded) finalMainImageUrl = uploaded; }
+    if (newImageFile) {
+      const uploaded = await uploadImage(newImageFile);
+      if (uploaded) finalMainImageUrl = uploaded;
+    }
     
-    const recipeData = { name: newName, category: newCategory, keywords: newKeywords.split(",").map(k => k.trim()), soak_time: newSoak, cook_time: newCook, description: newDesc, image: finalMainImageUrl || null };
+    const recipeData = { 
+      name: newName, 
+      category: newCategory, 
+      keywords: newKeywords.split(",").map(k => k.trim()), 
+      soak_time: newSoak, 
+      cook_time: newCook, 
+      description: newDesc, 
+      image: finalMainImageUrl || null 
+    };
     
     let recipeId = editingId;
+
     if (editingId) { 
-      await supabase.from('recipes').update(recipeData).eq('id', editingId); 
+      // 更新処理
+      const { error } = await supabase.from('recipes').update(recipeData).eq('id', editingId);
+      if (error) throw error;
       await supabase.from('recipe_steps').delete().eq('recipe_id', editingId); 
     } else { 
-      const { data } = await supabase.from('recipes').insert([recipeData]).select(); 
-      recipeId = data?.[0].id; 
+      // 新規登録処理
+      // .select() をつけることで、挿入されたデータの ID を取得します
+      const { data, error } = await supabase.from('recipes').insert([recipeData]).select(); 
+      if (error) throw error; // ここでエラーがあればキャッチする
+      if (!data || data.length === 0) throw new Error("データの挿入に失敗しました（返り値が空です）");
+      
+      recipeId = data[0].id; 
     }
 
     if (recipeId) {
-      const stepDataPromises = steps.filter(s => s.description).map(async (s, index) => {
-        let finalStepUrl = s.image_url;
-        if (s.image_file) { const uploaded = await uploadImage(s.image_file); if (uploaded) finalStepUrl = uploaded; }
-        return { recipe_id: recipeId, step_number: index + 1, description: s.description, image_url: finalStepUrl || null };
-      });
+      const stepDataPromises = steps
+        .filter(s => s.description.trim() !== "") // 空の手順は除外
+        .map(async (s, index) => {
+          let finalStepUrl = s.image_url;
+          if (s.image_file) {
+            const uploaded = await uploadImage(s.image_file);
+            if (uploaded) finalStepUrl = uploaded;
+          }
+          return { 
+            recipe_id: recipeId, 
+            step_number: index + 1, 
+            description: s.description, 
+            image_url: finalStepUrl || null 
+          };
+        });
+        
       const stepData = await Promise.all(stepDataPromises);
-      if (stepData.length > 0) await supabase.from('recipe_steps').insert(stepData);
+      if (stepData.length > 0) {
+        const { error: stepError } = await supabase.from('recipe_steps').insert(stepData);
+        if (stepError) throw stepError;
+      }
     }
-    setShowForm(false); resetForm(); fetchRecipes();
-  };
+
+    alert("保存しました！");
+    setShowForm(false); 
+    resetForm(); 
+    fetchRecipes();
+  } catch (error: any) {
+    console.error("保存エラー:", error.message);
+    alert("保存に失敗しました: " + error.message);
+  }
+};
 
   const resetForm = () => {
     setEditingId(null); setNewName(""); setNewSoak(""); setNewCook(""); setNewDesc(""); setNewKeywords(""); setNewImageUrl(""); setNewImageFile(null);
